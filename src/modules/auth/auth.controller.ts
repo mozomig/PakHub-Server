@@ -11,12 +11,14 @@ export class AuthController {
   @Public()
   @Post('register')
   async register(@Body() userInputDto: UserInputDto): Promise<AuthResponseDto> {
-    return this.authService.register(userInputDto);
+    const tokens = await this.authService.register(userInputDto);
+    return new AuthResponseDto(tokens.accessToken, tokens.refreshToken);
   }
 
   @Public()
   @Post('login')
   async login(@Body() userInputDto: UserInputDto): Promise<AuthResponseDto> {
-    return this.authService.login(userInputDto);
+    const tokens = await this.authService.login(userInputDto);
+    return new AuthResponseDto(tokens.accessToken, tokens.refreshToken);
   }
 }

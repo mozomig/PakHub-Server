@@ -10,7 +10,6 @@ import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { ConfigService } from '@nestjs/config';
 import type { JwtPayload } from './types/jwt_payload.types';
-import type { AuthResponseDto } from './dto/auth-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +20,7 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async register(userInputDto: UserInputDto): Promise<AuthResponseDto> {
+  async register(userInputDto: UserInputDto) {
     const { email } = userInputDto;
 
     const user = await this.userService.findByEmail(email);
@@ -52,7 +51,7 @@ export class AuthService {
     };
   }
 
-  async login(userInputDto: UserInputDto): Promise<AuthResponseDto> {
+  async login(userInputDto: UserInputDto) {
     const { email, password } = userInputDto;
 
     const user = await this.userService.findByEmail(email);
