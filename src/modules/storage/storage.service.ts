@@ -75,9 +75,6 @@ export class StorageService {
       });
 
       await this.s3Client.send(command);
-      this.logger.log(
-        `File uploaded successfully: ${key} to bucket: ${bucket}`,
-      );
       const uploadedFile = await this.prisma.file.create({
         data: {
           type,
@@ -124,7 +121,6 @@ export class StorageService {
       expiresIn: this.presignedUrlExpiresIn,
     });
 
-    this.logger.log(`Generated presigned URL for ${fileId}`);
     return url;
   }
 

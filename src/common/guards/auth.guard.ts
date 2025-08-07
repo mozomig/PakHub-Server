@@ -26,12 +26,10 @@ export class AuthGuard extends PassportAuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handleRequest(err, user, info) {
+  handleRequest(err: any, user: any): any {
     if (err || !user) {
       throw err || new UnauthorizedException();
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return user;
   }
 }

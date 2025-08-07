@@ -6,6 +6,8 @@ import { AuthGuard } from './common/guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core/constants';
 import { AppsModule } from './modules/apps/apps.module';
 import { StorageModule } from './modules/storage/storage.module';
+import { UserRoleGuard } from './common/guards/user-role.guard';
+import { AppRoleGuard } from './common/guards/app-role.guard';
 
 @Module({
   imports: [
@@ -19,6 +21,14 @@ import { StorageModule } from './modules/storage/storage.module';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: UserRoleGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AppRoleGuard,
     },
   ],
 })

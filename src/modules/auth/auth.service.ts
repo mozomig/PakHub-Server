@@ -4,7 +4,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserService } from 'src/modules/user/user.service';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { UserInputDto } from './dto/user-input.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
@@ -15,7 +14,6 @@ import type { JwtPayload } from './types/jwt_payload.types';
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
@@ -31,12 +29,7 @@ export class AuthService {
 
     const password = await argon2.hash(userInputDto.password);
 
-    const registeredUser = await this.prismaService.user.create({
-      data: {
-        email,
-        password,
-      },
-    });
+    const registeredUser = await this.userService.create(email, password);
 
     const payload: JwtPayload = {
       sub: registeredUser.id,

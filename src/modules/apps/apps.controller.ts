@@ -23,7 +23,7 @@ import { UpdateAppDto } from './dto/update-app.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { StorageService } from '../storage/storage.service';
 import { FileDto } from '../storage/dto/file.dto';
-import { FileType } from 'generated/prisma';
+import { AppRole, FileType, UserRole } from 'generated/prisma';
 import {
   ApiBody,
   ApiConsumes,
@@ -32,6 +32,8 @@ import {
   ApiParam,
   ApiResponse,
 } from '@nestjs/swagger';
+import { UserRoles } from 'src/common/decorators/user-role.decorator';
+import { AppRoles } from 'src/common/decorators/app-role.decorator';
 
 @Controller('apps')
 @UseGuards(AuthGuard)
@@ -63,6 +65,7 @@ export class AppsController {
     type: AppDto,
   })
   @Post()
+  @UserRoles(UserRole.CREATOR)
   async create(
     @Body() createAppDto: CreateAppDto,
     @CurrentUser() user: CurrentUserType,
@@ -79,9 +82,15 @@ export class AppsController {
   @ApiNotFoundResponse({
     description: 'App not found',
   })
-  @Patch(':id')
+  @ApiParam({
+    name: 'appId',
+    description: 'App ID',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @Patch(':appId')
+  @AppRoles(AppRole.ADMIN)
   async update(
-    @Param('id') id: string,
+    @Param('appId') id: string,
     @Body() updateAppDto: UpdateAppDto,
   ): Promise<AppDto> {
     const app = await this.appsService.update(id, updateAppDto);
@@ -122,10 +131,15 @@ export class AppsController {
     description: 'File ID',
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
+  @ApiParam({
+    name: 'appId',
+    description: 'App ID',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
   @ApiNotFoundResponse({
     description: 'File not found',
   })
-  @Get('logo/:id')
+  @Get(':appId/logo/:id')
   async getLogo(@Param('id') id: string, @Res() res: Response): Promise<void> {
     const url = await this.storageService.getFileUrl(id);
     res.redirect(url);

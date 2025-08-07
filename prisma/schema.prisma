@@ -43,7 +43,8 @@ model AppUser {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@index([appId, userId])
+  @@unique([appId, userId])
+  @@index([appId, userId], name: "appId_userId")
   @@map("app_users")
 }
 
