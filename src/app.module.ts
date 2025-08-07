@@ -4,7 +4,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthGuard } from './common/guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core/constants';
-import { AppsModule } from './modules/apps/apps/apps.module';
+import { AppsModule } from './modules/apps/apps.module';
+import { StorageModule } from './modules/storage/storage.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { AppsModule } from './modules/apps/apps/apps.module';
     PrismaModule,
     AuthModule,
     AppsModule,
+    StorageModule,
   ],
   providers: [
     {

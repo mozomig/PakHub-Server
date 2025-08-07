@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { App, AppRole } from 'generated/prisma';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateAppDto } from './dto/update-app.dto';
+import { CreateAppDto } from './dto/create-app.dto';
 
 @Injectable()
 export class AppsService {
@@ -24,10 +25,12 @@ export class AppsService {
     });
   }
 
-  async create(userId: string, name: string): Promise<App> {
+  async create(userId: string, input: CreateAppDto): Promise<App> {
+    const { name, logoId } = input;
     return this.prisma.app.create({
       data: {
         name,
+        logoId,
         users: {
           create: {
             userId: userId,

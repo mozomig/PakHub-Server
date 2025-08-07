@@ -23,11 +23,12 @@ model User {
 model App {
   id        String    @id @default(uuid())
   name      String
-  logoUrl   String?   @map("logo_url")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   stages    Stage[]
   users     AppUser[]
+  logoId    String?   @map("logo_id")
+  logo      File?     @relation("AppLogo", fields: [logoId], references: [id], onDelete: SetNull)
 
   @@map("apps")
 }
@@ -60,20 +61,46 @@ model Stage {
 }
 
 model Build {
-  id           String   @id @default(uuid())
+  id           String  @id @default(uuid())
   version      String
-  buildNumber  Int?     @map("build_number")
-  releaseNotes String?  @map("release_notes")
-  fileUrl      String   @map("file_url")
-  fileSize     Int      @map("file_size")
-  isActive     Boolean  @default(true) @map("is_active")
-  stageId      String   @map("stage_id")
-  stage        Stage    @relation(fields: [stageId], references: [id], onDelete: Cascade)
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  buildNumber  Int?    @map("build_number")
+  releaseNotes String? @map("release_notes")
+  stageId      String  @map("stage_id")
+  stage        Stage   @relation(fields: [stageId], references: [id], onDelete: Cascade)
+
+  fileId String? @map("file_id")
+  file   File?   @relation(fields: [fileId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([stageId])
   @@map("builds")
+}
+
+model File {
+  id        String    @id @default(uuid())
+  type      FileType
+  fileName  String    @map("file_name")
+  fileSize  Int       @map("file_size")
+  mimeType  String    @map("mime_type")
+  metadata  Json?     @map("metadata")
+  expiresAt DateTime? @map("expires_at")
+
+  storageProvider StorageProvider @default(S3) @map("storage_provider")
+  storagePath     String          @map("storage_path")
+  storageBucket   String?         @map("storage_bucket")
+
+  isPublic Boolean @default(false) @map("is_public")
+
+  App   App[]   @relation("AppLogo")
+  Build Build[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([expiresAt])
+  @@map("files")
 }
 
 enum UserRole {
@@ -84,4 +111,13 @@ enum UserRole {
 enum AppRole {
   ADMIN
   MEMBER
+}
+
+enum FileType {
+  LOGO
+  BUILDS
+}
+
+enum StorageProvider {
+  S3
 }

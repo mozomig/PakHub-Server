@@ -8,5 +8,5 @@ export class CreateAppDto {
 
   @IsOptional()
   @IsString()
-  logoUrl?: string;
+  logoId?: string;
 }

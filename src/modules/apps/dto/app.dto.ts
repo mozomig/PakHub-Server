@@ -1,8 +1,8 @@
 import { Expose } from 'class-transformer';
 import { App } from 'generated/prisma';
 
-export class AppDto implements Partial<App> {
-  constructor(app: App) {
+export class AppDto implements App {
+  constructor(app: Partial<App>) {
     Object.assign(this, app);
   }
 
@@ -13,7 +13,7 @@ export class AppDto implements Partial<App> {
   name: string;
 
   @Expose()
-  logoUrl?: string;
+  logoId: string | null;
 
   @Expose()
   createdAt: Date;
