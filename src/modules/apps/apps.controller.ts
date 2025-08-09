@@ -24,8 +24,8 @@ import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { CreateAppDto } from './dto/create-app.dto';
 import { UpdateAppDto } from './dto/update-app.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { StorageService } from '../storage/storage.service';
-import { FileDto } from '../storage/dto/file.dto';
+import { StorageService } from '../../infra/storage/storage.service';
+import { FileDto } from '../../infra/storage/dto/file.dto';
 import { AppRole, FileType, UserRole } from 'generated/prisma';
 import {
   ApiBody,

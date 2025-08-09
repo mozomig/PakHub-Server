@@ -63,7 +63,9 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await argon2.verify(user.password, password);
+    const hashedPassword = await this.userService.getHashedPassword(user.id);
+
+    const isPasswordValid = await argon2.verify(hashedPassword, password);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');

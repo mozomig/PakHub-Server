@@ -5,5 +5,6 @@ import { AppMembersController } from './app-members.controller';
 @Module({
   controllers: [AppMembersController],
   providers: [AppMembersService],
+  exports: [AppMembersService],
 })
 export class AppMembersModule {}

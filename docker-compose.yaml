@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:17.5
@@ -34,10 +32,26 @@ services:
     volumes:
       - minio-data:/bitnami/minio/data
 
+  valkey:
+    image: valkey/valkey:8.1
+    command: ['valkey-server', '--requirepass', '${VALKEY_PASSWORD}']
+    environment:
+      VALKEY_PASSWORD: ${VALKEY_PASSWORD}
+    container_name: pakhub-valkey
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - valkey-data:/data
+    networks:
+      - pakhub-network
+
 volumes:
   postgres_data:
     driver: local
   minio-data:
+    driver: local
+  valkey-data:
     driver: local
 
 networks:

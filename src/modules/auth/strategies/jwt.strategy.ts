@@ -4,12 +4,12 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '../../user/user.service';
 import type { JwtPayload } from '../types/jwt_payload.types';
-import { User } from 'generated/prisma';
+import { CurrentUserType } from 'src/common/types/current-user.types';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private readonly configService: ConfigService,
+    configService: ConfigService,
     private readonly userService: UserService,
   ) {
     super({
@@ -26,8 +26,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload): Promise<User> {
-    //todo: add cache
+  async validate(payload: JwtPayload): Promise<CurrentUserType> {
     const user = await this.userService.findById(payload.sub);
 
     if (!user) {

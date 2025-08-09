@@ -6,6 +6,7 @@ import {
 import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { CurrentUserType } from '../types/current-user.types';
 
 @Injectable()
 export class AuthGuard extends PassportAuthGuard('jwt') {
@@ -26,7 +27,7 @@ export class AuthGuard extends PassportAuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  handleRequest(err: any, user: any): any {
+  handleRequest(err: any, user: CurrentUserType): any {
     if (err || !user) {
       throw err || new UnauthorizedException();
     }

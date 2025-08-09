@@ -27,8 +27,8 @@ import { AppRoles } from 'src/common/decorators/app-role.decorator';
 import { AppRole, FileType } from 'generated/prisma';
 import { AddBuildDto } from './dto/add-build.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FileDto } from '../storage/dto/file.dto';
-import { StorageService } from '../storage/storage.service';
+import { FileDto } from '../../infra/storage/dto/file.dto';
+import { StorageService } from '../../infra/storage/storage.service';
 import type { Response } from 'express';
 
 @Controller('apps/:appId/builds')

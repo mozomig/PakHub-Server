@@ -9,13 +9,13 @@ import { Request } from 'express';
 import { CurrentUserType } from '../types/current-user.types';
 import { APP_ROLES_KEY } from '../decorators/app-role.decorator';
 import { AppRole } from 'generated/prisma';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { AppMembersService } from 'src/modules/app-members/app-members.service';
 
 @Injectable()
 export class AppRoleGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private prisma: PrismaService,
+    private appMemberService: AppMembersService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -36,22 +36,13 @@ export class AppRoleGuard implements CanActivate {
       throw new ForbiddenException();
     }
 
-    //TODO: add cache
-    const appUser = await this.prisma.appUser.findUnique({
-      where: {
-        appId_userId: {
-          appId,
-          userId: user.id,
-        },
-      },
-      select: { role: true },
-    });
+    const userRole = await this.appMemberService.getRole(appId, user.id);
 
-    if (!appUser) {
+    if (!userRole) {
       throw new ForbiddenException();
     }
 
-    return requiredRoles.includes(appUser.role);
+    return requiredRoles.includes(userRole);
   }
 
   private extractAppId(request: Request): string | null {

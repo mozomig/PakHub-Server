@@ -10,10 +10,6 @@ export const CurrentUser = createParamDecorator(
     const request = ctx.switchToHttp().getRequest<RequestWithUser>();
     const user = request.user;
 
-    return {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    };
+    return user;
   },
 );
