@@ -10,6 +10,7 @@ import { UserRoleGuard } from './common/guards/user-role.guard';
 import { AppRoleGuard } from './common/guards/app-role.guard';
 import { StagesModule } from './modules/stages/stages.module';
 import { AppMembersModule } from './modules/app-members/app-members.module';
+import { BuildsModule } from './modules/builds/builds.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AppMembersModule } from './modules/app-members/app-members.module';
     StorageModule,
     StagesModule,
     AppMembersModule,
+    BuildsModule,
   ],
   providers: [
     {

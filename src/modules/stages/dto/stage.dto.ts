@@ -2,7 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { Stage } from 'generated/prisma';
 
-export class StageDto implements Partial<Stage> {
+export class StageDto
+  implements Pick<Stage, 'id' | 'name' | 'createdAt' | 'updatedAt'>
+{
   constructor(stage: Partial<Stage>) {
     Object.assign(this, stage);
   }

@@ -24,7 +24,9 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('PAKHUB API')
-    .setDescription('Service for managing applications build like a testflight')
+    .setDescription(
+      'Service for managing applications build like a Firebase App Distribution',
+    )
     .setVersion('1.0')
     .addTag('PAKHUB')
     .build();
