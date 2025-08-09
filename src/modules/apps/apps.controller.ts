@@ -10,6 +10,9 @@ import {
   UseGuards,
   UseInterceptors,
   Res,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { AppsService } from './apps.service';
@@ -115,7 +118,17 @@ export class AppsController {
   @Post('logo/upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadLogo(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 10 }),
+          new FileTypeValidator({
+            fileType: /(jpg|jpeg|png|webp)$/,
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
   ): Promise<FileDto> {
     const id = await this.storageService.upload(file, FileType.LOGO);
     return new FileDto(id);

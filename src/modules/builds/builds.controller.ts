@@ -2,26 +2,41 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Post,
   Query,
+  Res,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { BuildsService } from './builds.service';
 import { GetBuildsDto } from './dto/get-build.dto';
 import { BuildDto } from './dto/build.dto';
 import {
+  ApiBody,
+  ApiConsumes,
   ApiForbiddenResponse,
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
 import { AppRoles } from 'src/common/decorators/app-role.decorator';
-import { AppRole } from 'generated/prisma';
+import { AppRole, FileType } from 'generated/prisma';
 import { AddBuildDto } from './dto/add-build.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileDto } from '../storage/dto/file.dto';
+import { StorageService } from '../storage/storage.service';
+import type { Response } from 'express';
 
 @Controller('apps/:appId/builds')
 export class BuildsController {
-  constructor(private readonly buildsService: BuildsService) {}
+  constructor(
+    private readonly buildsService: BuildsService,
+    private readonly storageService: StorageService,
+  ) {}
 
   @ApiOperation({ summary: 'Get builds' })
   @ApiResponse({ status: 200, type: [BuildDto] })
@@ -65,5 +80,53 @@ export class BuildsController {
     @Param('buildId') buildId: string,
   ): Promise<void> {
     await this.buildsService.deleteBuild(appId, buildId);
+  }
+
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Upload build' })
+  @ApiResponse({
+    status: 200,
+    type: FileDto,
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async upload(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 300 }),
+          new FileTypeValidator({
+            fileType: /(apk|aab)$/,
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ): Promise<FileDto> {
+    const id = await this.storageService.upload(file, FileType.BUILDS);
+    return new FileDto(id);
+  }
+
+  @ApiOperation({ summary: 'Download build' })
+  @ApiResponse({ status: 200, description: 'Redirect to build file' })
+  @ApiForbiddenResponse()
+  @Get(':id')
+  @AppRoles(AppRole.ADMIN, AppRole.MEMBER)
+  async downloadBuild(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const url = await this.storageService.getFileUrl(id);
+    res.redirect(url);
   }
 }
