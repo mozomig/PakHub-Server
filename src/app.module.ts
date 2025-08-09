@@ -8,6 +8,8 @@ import { AppsModule } from './modules/apps/apps.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { UserRoleGuard } from './common/guards/user-role.guard';
 import { AppRoleGuard } from './common/guards/app-role.guard';
+import { StagesModule } from './modules/stages/stages.module';
+import { AppMembersModule } from './modules/app-members/app-members.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { AppRoleGuard } from './common/guards/app-role.guard';
     AuthModule,
     AppsModule,
     StorageModule,
+    StagesModule,
+    AppMembersModule,
   ],
   providers: [
     {
