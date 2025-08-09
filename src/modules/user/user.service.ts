@@ -3,8 +3,9 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CurrentUserType } from 'src/common/types/current-user.types';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-const USER_CACHE_KEY = 'user';
+const USER_CACHE_KEY = (id: string) => `user:${id}`;
 const USER_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
+
 @Injectable()
 export class UserService {
   constructor(
@@ -29,7 +30,7 @@ export class UserService {
 
   async findByEmail(email: string): Promise<CurrentUserType | null> {
     const cachedUser = await this.cacheManager.get<CurrentUserType>(
-      `${USER_CACHE_KEY}:${email}`,
+      USER_CACHE_KEY(email),
     );
     if (cachedUser) {
       return cachedUser;
@@ -45,7 +46,7 @@ export class UserService {
 
   async findById(id: string): Promise<CurrentUserType | null> {
     const cachedUser = await this.cacheManager.get<CurrentUserType>(
-      `${USER_CACHE_KEY}:${id}`,
+      USER_CACHE_KEY(id),
     );
     if (cachedUser) {
       return cachedUser;
@@ -69,16 +70,8 @@ export class UserService {
 
   private async cacheUser(user: CurrentUserType) {
     await Promise.allSettled([
-      this.cacheManager.set(
-        `${USER_CACHE_KEY}:${user.id}`,
-        user,
-        USER_CACHE_TTL,
-      ),
-      this.cacheManager.set(
-        `${USER_CACHE_KEY}:${user.email}`,
-        user,
-        USER_CACHE_TTL,
-      ),
+      this.cacheManager.set(USER_CACHE_KEY(user.id), user, USER_CACHE_TTL),
+      this.cacheManager.set(USER_CACHE_KEY(user.email), user, USER_CACHE_TTL),
     ]);
   }
 }
