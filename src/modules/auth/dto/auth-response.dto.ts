@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
+import { Tokens } from '../types/tokens.types';
 
 export class AuthResponseDto {
-  constructor(accessToken: string, refreshToken: string) {
-    this.accessToken = accessToken;
-    this.refreshToken = refreshToken;
+  constructor(tokens: Tokens) {
+    Object.assign(this, tokens);
   }
 
   @ApiProperty({
@@ -18,4 +18,10 @@ export class AuthResponseDto {
   })
   @Expose()
   refreshToken: string;
+
+  @ApiProperty({
+    description: 'Refresh token expiration date',
+  })
+  @Expose()
+  expiresAtRefreshToken: Date;
 }

@@ -6,6 +6,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 
 export class UserInputDto {
   @ApiProperty({
@@ -15,6 +16,8 @@ export class UserInputDto {
   @IsNotEmpty()
   @IsEmail()
   @IsString()
+  @Type(() => String)
+  @Transform(({ value }) => (value as string).toLowerCase().trim())
   email: string;
 
   @ApiProperty({
@@ -28,4 +31,12 @@ export class UserInputDto {
   @MinLength(8)
   @MaxLength(30)
   password: string;
+
+  @ApiProperty({
+    description: 'Device specification',
+    example: 'iPhone 13, iOS 15.0',
+  })
+  @IsString()
+  @IsNotEmpty()
+  device: string;
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserInputDto } from './dto/user-input.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
@@ -9,6 +9,7 @@ import {
   ApiResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { RefreshDto } from './dto/refresh.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -27,7 +28,7 @@ export class AuthController {
   @Post('register')
   async register(@Body() userInputDto: UserInputDto): Promise<AuthResponseDto> {
     const tokens = await this.authService.register(userInputDto);
-    return new AuthResponseDto(tokens.accessToken, tokens.refreshToken);
+    return new AuthResponseDto(tokens);
   }
 
   @ApiOperation({ summary: 'Login a user' })
@@ -43,6 +44,30 @@ export class AuthController {
   @Post('login')
   async login(@Body() userInputDto: UserInputDto): Promise<AuthResponseDto> {
     const tokens = await this.authService.login(userInputDto);
-    return new AuthResponseDto(tokens.accessToken, tokens.refreshToken);
+    return new AuthResponseDto(tokens);
+  }
+
+  @ApiOperation({ summary: 'Refresh tokens' })
+  @ApiResponse({
+    status: 200,
+    description: 'Tokens refreshed',
+    type: AuthResponseDto,
+  })
+  @ApiUnauthorizedResponse({ description: 'Invalid or expired refresh token' })
+  @Public()
+  @Post('refresh')
+  async refresh(@Body() dto: RefreshDto): Promise<AuthResponseDto> {
+    const tokens = await this.authService.refresh(dto.refreshToken, dto.device);
+    return new AuthResponseDto(tokens);
+  }
+
+  @ApiOperation({ summary: 'Logout (revoke refresh token)' })
+  @ApiResponse({ status: 204, description: 'Logged out' })
+  @ApiUnauthorizedResponse({ description: 'Invalid or expired refresh token' })
+  @Public()
+  @Post('logout')
+  @HttpCode(204)
+  async logout(@Body() dto: RefreshDto): Promise<void> {
+    await this.authService.logout(dto.refreshToken);
   }
 }

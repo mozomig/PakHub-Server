@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
+import { RefreshTokenService } from './refresh-token.service';
 
 @Module({
   imports: [
@@ -20,12 +21,15 @@ import { PassportModule } from '@nestjs/passport';
           expiresIn: configService.getOrThrow<string>('JWT_EXPIRES_IN'),
           audience: configService.getOrThrow<string>('JWT_AUDIENCE'),
           issuer: configService.getOrThrow<string>('JWT_ISSUER'),
+          algorithm: configService.getOrThrow<string>(
+            'JWT_ALGORITHM',
+          ) as import('jsonwebtoken').Algorithm,
         },
       }),
       inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, RefreshTokenService],
 })
 export class AuthModule {}

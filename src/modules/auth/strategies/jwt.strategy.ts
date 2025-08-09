@@ -18,6 +18,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: configService.getOrThrow<string>('JWT_SECRET'),
       audience: configService.getOrThrow<string>('JWT_AUDIENCE'),
       issuer: configService.getOrThrow<string>('JWT_ISSUER'),
+      algorithms: [
+        configService.getOrThrow<string>(
+          'JWT_ALGORITHM',
+        ) as import('jsonwebtoken').Algorithm,
+      ],
     });
   }
 
