@@ -13,6 +13,7 @@ import { AppMembersModule } from './modules/app-members/app-members.module';
 import { BuildsModule } from './modules/builds/builds.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv } from '@keyv/redis';
+import { UsersModule } from './modules/users/user.smodule';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { createKeyv } from '@keyv/redis';
     StagesModule,
     AppMembersModule,
     BuildsModule,
+    UsersModule,
   ],
   providers: [
     {

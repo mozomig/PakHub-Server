@@ -7,7 +7,7 @@ const USER_CACHE_KEY = (id: string) => `user:${id}`;
 const USER_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
 @Injectable()
-export class UserService {
+export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,

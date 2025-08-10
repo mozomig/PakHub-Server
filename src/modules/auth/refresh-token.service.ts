@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/infra/prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
+import { Prisma } from 'generated/prisma';
 
 @Injectable()
 export class RefreshTokenService {
@@ -43,7 +44,7 @@ export class RefreshTokenService {
   async revoke(token: string): Promise<void> {
     const tokenHash = this.hashToken(token);
 
-    await this.prisma.session.updateMany({
+    await this.prisma.session.update({
       where: { tokenHash, revokedAt: null },
       data: { revokedAt: new Date() },
     });
@@ -84,8 +85,36 @@ export class RefreshTokenService {
     token: string;
     expiresAt: Date;
   }> {
-    await this.revoke(oldToken);
-    return this.issue(userId, device);
+    const oldTokenHash = this.hashToken(oldToken);
+
+    if (!oldTokenHash) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    const token = this.generateRawToken();
+    const expiresAt = this.computeExpiresAt();
+    const tokenHash = this.hashToken(token);
+
+    const result = await this.prisma.$transaction(
+      async (tx) => {
+        await tx.session.update({
+          where: { tokenHash: oldTokenHash },
+          data: { revokedAt: new Date() },
+        });
+        return tx.session.create({
+          data: { userId, device, tokenHash, expiresAt },
+        });
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+      },
+    );
+
+    return {
+      sid: result.id,
+      token: token,
+      expiresAt: result.expiresAt,
+    };
   }
 
   async revokeAllForUser(userId: string): Promise<number> {

@@ -3,7 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserService } from 'src/modules/user/user.service';
+import { UsersService } from 'src/modules/users/users.service';
 import { UserInputDto } from './dto/user-input.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
@@ -15,7 +15,7 @@ import type { Tokens } from './types/tokens.types';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userService: UserService,
+    private readonly userService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly refreshTokenService: RefreshTokenService,
