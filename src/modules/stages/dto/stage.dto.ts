@@ -2,9 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { Stage } from 'generated/prisma';
 
-export class StageDto
-  implements Pick<Stage, 'id' | 'name' | 'createdAt' | 'updatedAt'>
-{
+export class StageDto implements Pick<Stage, 'id' | 'name'> {
   constructor(stage: Partial<Stage>) {
     Object.assign(this, stage);
   }
@@ -22,18 +20,4 @@ export class StageDto
   })
   @Expose()
   name: string;
-
-  @ApiProperty({
-    description: 'Stage created at',
-    example: '2021-01-01T00:00:00.000Z',
-  })
-  @Expose()
-  createdAt: Date;
-
-  @ApiProperty({
-    description: 'Stage updated at',
-    example: '2021-01-01T00:00:00.000Z',
-  })
-  @Expose()
-  updatedAt: Date;
 }

@@ -4,16 +4,7 @@ import { Build } from 'generated/prisma';
 
 export class BuildDto
   implements
-    Pick<
-      Build,
-      | 'id'
-      | 'version'
-      | 'buildNumber'
-      | 'releaseNotes'
-      | 'createdAt'
-      | 'updatedAt'
-      | 'fileId'
-    >
+    Pick<Build, 'id' | 'version' | 'buildNumber' | 'releaseNotes' | 'fileId'>
 {
   constructor(build: Partial<Build>) {
     Object.assign(this, build);
@@ -55,18 +46,4 @@ export class BuildDto
   })
   @Expose()
   fileId: string;
-
-  @ApiProperty({
-    description: 'Build created at',
-    example: '2021-01-01T00:00:00.000Z',
-  })
-  @Expose()
-  createdAt: Date;
-
-  @ApiProperty({
-    description: 'Build updated at',
-    example: '2021-01-01T00:00:00.000Z',
-  })
-  @Expose()
-  updatedAt: Date;
 }

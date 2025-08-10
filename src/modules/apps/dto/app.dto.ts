@@ -1,10 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { App } from 'generated/prisma';
+import { LastBuildDto } from './last-build.dto';
+import { AppSummary } from '../types/app-summary.types';
 
-export class AppDto implements App {
-  constructor(app: Partial<App>) {
+export class AppDto implements Pick<App, 'id' | 'name' | 'logoId'> {
+  constructor(app: Partial<AppSummary>) {
     Object.assign(this, app);
+    if (app.stages) {
+      this.stages = app.stages.map(
+        (stage) => new LastBuildDto(stage, stage.builds?.[0]),
+      );
+    }
   }
 
   @ApiProperty({
@@ -30,16 +37,11 @@ export class AppDto implements App {
   logoId: string | null;
 
   @ApiProperty({
-    description: 'App created at',
-    example: '2021-01-01T00:00:00.000Z',
+    description: 'Stages',
+    type: LastBuildDto,
+    isArray: true,
+    required: false,
   })
   @Expose()
-  createdAt: Date;
-
-  @ApiProperty({
-    description: 'App updated at',
-    example: '2021-01-01T00:00:00.000Z',
-  })
-  @Expose()
-  updatedAt: Date;
+  stages?: LastBuildDto[];
 }

@@ -106,7 +106,7 @@ export class BuildsController {
         validators: [
           new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 300 }),
           new FileTypeValidator({
-            fileType: /(apk|aab)$/,
+            fileType: 'application/vnd.android.package-archive`',
           }),
         ],
       }),
@@ -120,13 +120,13 @@ export class BuildsController {
   @ApiOperation({ summary: 'Download build' })
   @ApiResponse({ status: 200, description: 'Redirect to build file' })
   @ApiForbiddenResponse()
-  @Get(':id')
+  @Get(':fileId')
   @AppRoles(AppRole.ADMIN, AppRole.MEMBER)
   async downloadBuild(
-    @Param('id') id: string,
+    @Param('fileId') fileId: string,
     @Res() res: Response,
   ): Promise<void> {
-    const url = await this.storageService.getFileUrl(id);
+    const url = await this.storageService.getFileUrl(fileId);
     res.redirect(url);
   }
 }

@@ -62,7 +62,7 @@ model AppUser {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@unique([appId, userId])
-  @@index([appId, userId], name: "appId_userId")
+  @@index([userId, appId], name: "userId_appId")
   @@map("app_users")
 }
 
@@ -94,6 +94,7 @@ model Build {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([stageId])
+  @@index([stageId, createdAt])
   @@map("builds")
 }
 
