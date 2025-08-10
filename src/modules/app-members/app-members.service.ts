@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { AppRole } from 'generated/prisma';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infra/prisma/prisma.service';
 import { AppMember } from './types/app-member.type';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 

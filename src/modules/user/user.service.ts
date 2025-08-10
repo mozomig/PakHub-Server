@@ -1,6 +1,6 @@
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infra/prisma/prisma.service';
 import { UserEntity } from './entity/user.entity';
 
 const USER_CACHE_KEY = (id: string) => `user:${id}`;

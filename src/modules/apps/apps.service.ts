@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { App, AppRole } from 'generated/prisma';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/infra/prisma/prisma.service';
 import { UpdateAppDto } from './dto/update-app.dto';
 import { CreateAppDto } from './dto/create-app.dto';
 import { AppSummary } from './types/app-summary.types';
