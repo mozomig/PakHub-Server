@@ -51,7 +51,6 @@ export class UsersService {
     if (cachedUser) {
       return cachedUser;
     }
-
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (user) {
       await this.cacheUser(new UserEntity(user));

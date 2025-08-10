@@ -1,19 +1,16 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from './infra/prisma/prisma.module';
-import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthGuard } from './common/guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core/constants';
-import { AppsModule } from './modules/apps/apps.module';
-import { StorageModule } from './infra/storage/storage.module';
 import { UserRoleGuard } from './common/guards/user-role.guard';
 import { AppRoleGuard } from './common/guards/app-role.guard';
-import { StagesModule } from './modules/stages/stages.module';
-import { AppMembersModule } from './modules/app-members/app-members.module';
-import { BuildsModule } from './modules/builds/builds.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv } from '@keyv/redis';
-import { UsersModule } from './modules/users/user.smodule';
+import { BullModule } from '@nestjs/bullmq';
+import { SessionCleanerService } from './worker/session-cleaner/session-cleaner.service';
+import { WorkerModule } from './worker/worker.module';
+import { FeaturesModule } from './modules/features.module';
+import { InfraModule } from './infra/infra.module';
 
 @Module({
   imports: [
@@ -21,6 +18,7 @@ import { UsersModule } from './modules/users/user.smodule';
     CacheModule.registerAsync({
       isGlobal: true,
       inject: [ConfigService],
+      imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
         return {
           stores: [createKeyv(configService.get('VALKEY_URL'))],
@@ -29,16 +27,20 @@ import { UsersModule } from './modules/users/user.smodule';
           namespace: 'pakhub',
         };
       },
-      imports: [ConfigModule],
     }),
-    PrismaModule,
-    AuthModule,
-    AppsModule,
-    StorageModule,
-    StagesModule,
-    AppMembersModule,
-    BuildsModule,
-    UsersModule,
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        connection: {
+          url: configService.getOrThrow<string>('VALKEY_URL'),
+          prefix: 'pakhub-queue',
+        },
+      }),
+    }),
+    InfraModule,
+    FeaturesModule,
+    WorkerModule,
   ],
   providers: [
     {
@@ -53,6 +55,7 @@ import { UsersModule } from './modules/users/user.smodule';
       provide: APP_GUARD,
       useClass: AppRoleGuard,
     },
+    SessionCleanerService,
   ],
 })
 export class AppModule {}
