@@ -1,13 +1,7 @@
-import { User, UserRole } from 'generated/prisma';
+import { UserRole } from 'generated/prisma';
 
-export class CurrentUserType {
-  constructor(user: User) {
-    this.id = user.id;
-    this.email = user.email;
-    this.role = user.role;
-  }
-
+export type CurrentUserType = {
   id: string;
   email: string;
   role: UserRole;
-}
+};
