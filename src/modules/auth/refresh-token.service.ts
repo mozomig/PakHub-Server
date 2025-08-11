@@ -125,6 +125,24 @@ export class RefreshTokenService {
     return result.count;
   }
 
+  async cleanExpired(): Promise<number> {
+    const oneDayAgo = new Date(Date.now() - 1000 * 60 * 60 * 24);
+
+    const { count } = await this.prisma.session.deleteMany({
+      where: {
+        OR: [
+          {
+            revokedAt: { lt: oneDayAgo },
+          },
+          {
+            expiresAt: { lt: oneDayAgo },
+          },
+        ],
+      },
+    });
+    return count;
+  }
+
   private generateRawToken(): string {
     return crypto.randomBytes(64).toString('hex');
   }

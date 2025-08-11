@@ -5,9 +5,10 @@ import { Queue } from 'bullmq';
 import { ConfigService } from '@nestjs/config';
 import { SessionCleanerConsumer } from './session-cleaner.consumer';
 import { QUEUE_NAME, JOB_NAME, JOB_ID } from './constants';
-
+import { AuthModule } from 'src/modules/auth/auth.module';
 @Module({
   imports: [
+    AuthModule,
     BullModule.registerQueue({
       name: QUEUE_NAME,
     }),
@@ -21,16 +22,15 @@ export class SessionCleanerModule implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    await this.sessionCleanerQueue.add(
-      JOB_NAME,
-      {},
+    await this.sessionCleanerQueue.upsertJobScheduler(
+      JOB_ID,
       {
-        repeat: {
-          pattern: this.configService.getOrThrow<string>(
-            'CLEAN_SESSIONS_PATTERN',
-          ),
-        },
-        jobId: JOB_ID,
+        pattern: this.configService.getOrThrow<string>(
+          'CLEAN_SESSIONS_PATTERN',
+        ),
+      },
+      {
+        name: JOB_NAME,
       },
     );
   }
